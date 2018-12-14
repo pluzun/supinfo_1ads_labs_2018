@@ -17,6 +17,12 @@ PACMAN_IMAGES = {
     '180': pygame.image.load("PacMan180.png"),
     '270': pygame.image.load("PacMan270.png")
 }
+PACMAN_BOOSTED_IMAGES = {
+    '00': pygame.image.load("PacMan00Blue.png"),
+    '90': pygame.image.load("PacMan90Blue.png"),
+    '180': pygame.image.load("PacMan180Blue.png"),
+    '270': pygame.image.load("PacMan270Blue.png")
+}
 FPS = 8
 
 
@@ -46,8 +52,15 @@ def draw_pacgum(surface, x, y):
     pygame.draw.circle(surface,COLORS['yellow'], ((x * 30) + 15, (y * 30) + 15), 10)
 
 
-def draw_pacman(surface, x, y, inclinaison):
-    surface.blit(PACMAN_IMAGES[inclinaison], ((x * 30), (y * 30)))
+def draw_pacman(surface, pacman_position):
+    x = pacman_position['x']
+    y = pacman_position['y']
+    inclinaison = pacman_position['inclinaison']
+    boosted = pacman_position['boosted']
+    if boosted:
+        surface.blit(PACMAN_BOOSTED_IMAGES[inclinaison], ((x * 30), (y * 30)))
+    else:
+        surface.blit(PACMAN_IMAGES[inclinaison], ((x * 30), (y * 30)))
 
 
 def draw_map(surface, map):
@@ -89,12 +102,14 @@ def pacman():
     config = import_map('map_1')
     map = config['map']
     pacman_position = config['pacman_position']
+    pacman_position['boosted'] = False
+    pacman_position['boosted_time'] = 0
     direction = None
     score = 0
     while inProgress:
         draw_map(surface, config['map'])
         draw_score(surface, score)
-        draw_pacman(surface, pacman_position['x'], pacman_position['y'], pacman_position['inclinaison'])
+        draw_pacman(surface, pacman_position)
         for event in pygame.event.get():
             if event.type == QUIT:
                 inProgress = False
@@ -133,6 +148,8 @@ def pacman():
             if new_cell == 2:
                 score += 10
             elif new_cell == 3:
+                pacman_position['boosted'] = True
+                pacman_position['boosted_time'] = 6 * 8
                 score += 50
             elif new_cell == 4:
                 scoree += 200
@@ -142,6 +159,12 @@ def pacman():
                 scoree += 800
             elif new_cell == 7:
                 scoree += 1600
+
+        if pacman_position['boosted']:
+            if pacman_position['boosted_time'] == 0:
+                pacman_position['boosted'] = False
+            else:
+                pacman_position['boosted_time'] -= 1
 
         pygame.display.update()
         fpsClock.tick(FPS)
