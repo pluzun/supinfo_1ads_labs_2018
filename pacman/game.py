@@ -11,6 +11,12 @@ COLORS = {
     'blue': (0, 0, 255),
     'yellow': (255, 197, 33)
 }
+PACMAN_IMAGES = {
+    '00': pygame.image.load("PacMan00.png"),
+    '90': pygame.image.load("PacMan90.png"),
+    '180': pygame.image.load("PacMan180.png"),
+    '270': pygame.image.load("PacMan270.png")
+}
 FPS = 30
 
 
@@ -36,8 +42,13 @@ def draw_pacball(surface, x, y):
     pygame.draw.circle(surface,COLORS['yellow'], ((x * 30) + 15, (y * 30) + 15), 4)
 
 
-def draw_pacgum(arg):
-    pass
+def draw_pacgum(surface, x, y):
+    pygame.draw.circle(surface,COLORS['yellow'], ((x * 30) + 15, (y * 30) + 15), 10)
+
+
+def draw_pacman(surface, x, y, inclinaison):
+    surface.blit(PACMAN_IMAGES[inclinaison], ((x * 30), (y * 30)))
+
 
 def draw_map(surface, map):
     for line_nb in range(len(map)):
@@ -47,6 +58,8 @@ def draw_map(surface, map):
                 draw_wall(surface, cell_nb, line_nb)
             elif cell == 2:
                 draw_pacball(surface, cell_nb, line_nb)
+            elif cell == 3:
+                draw_pacgum(surface, cell_nb, line_nb)
 
 
 def pacman():
@@ -65,8 +78,10 @@ def pacman():
     fpsClock = pygame.time.Clock()
 
     map = import_map('map_1')
+    pacmac_position = map['pacman_position']
     while inProgress:
         draw_map(surface, map['map'])
+        draw_pacman(surface, pacmac_position['x'], pacmac_position['y'], pacmac_position['inclinaison'])
         for event in pygame.event.get():
             if event.type == QUIT:
                 inProgress = False
